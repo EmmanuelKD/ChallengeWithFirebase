@@ -65,7 +65,7 @@ function Signin({ navigation }: { navigation: any }) {
               setPassword(val)
             }}
             title="Password"
-            keyboardType="visible-password"
+            keyboardType="number-pad"
             secureTextEntry={true}
           />
           <View style={styles.grow}></View>

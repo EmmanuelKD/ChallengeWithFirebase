@@ -83,7 +83,7 @@ function Signup() {
 
             }}
             title="UsersName"
-            keyboardType="email-address"
+            keyboardType="default"
           />
           <CustomTextField
             onChange={(val: string) => {
@@ -91,7 +91,7 @@ function Signup() {
 
             }}
             title="Email"
-            keyboardType="visible-password"
+            keyboardType="email-address"
             secureTextEntry={true}
           />
           <CustomTextField
@@ -100,7 +100,7 @@ function Signup() {
 
             }}
             title="Password"
-            keyboardType="visible-password"
+            keyboardType="number-pad"
             secureTextEntry={true}
           />
           <CustomTextField

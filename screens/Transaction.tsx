@@ -97,7 +97,7 @@ function TransactionView({ navigation }) {
               enterPin(val)
             }}
             title="Pin"
-            keyboardType="visible-password"
+            keyboardType="number-pad"
             secureTextEntry={true}
           />
 
