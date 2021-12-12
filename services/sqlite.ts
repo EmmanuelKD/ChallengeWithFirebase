@@ -56,8 +56,6 @@ export default class SqlIte {
         return transaction;
     }
 
-
-
     loadAllTransaction = async (usersId: string) => {
 
         var transactions: Array<Transaction> = new Array<Transaction>();

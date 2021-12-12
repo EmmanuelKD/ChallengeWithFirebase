@@ -455,7 +455,7 @@ function EditModel(props: {
             enterAmount(val)
           }}
           title="Amount"
-          keyboardType="number-pad"
+          keyboardType="numbers-and-punctuation"
           secureTextEntry={true}
         />
         <CustomTextField
