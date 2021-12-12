@@ -1,15 +1,18 @@
 // import { Block, theme } from "galio-framework";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import AmountBadge from "../components/BalanceBadge/AmountBadge";
 import ListItemMain from "../components/ListItemMain";
+import { AuthContext } from "../context/authcontext/Auth_Context";
 
-class Dashboard extends React.Component {
+function Dashboard (){
 
-  componentDidMount() { }
+//  const authContext=useContext(AuthContext)
+// useEffect(()=>{
+//   console.log(authContext.user)
+// })
 
-  render() {
-    return (
+     return (
       // <NavigationContainer>
 
       <SafeAreaView style={styles.main}>
@@ -23,8 +26,7 @@ class Dashboard extends React.Component {
 
     );
   }
-}
-
+ 
 //  {/*  */}
 
 const styles = StyleSheet.create({

@@ -38,6 +38,10 @@ export default class FirebaseServices implements IDBservices {
     auth = this.app.auth;
     db = this.app.db;
 
+    constructor() {
+
+    }
+
     signin = async (email: string, password: string) => {
         return await this.auth.signInWithEmailAndPassword(email, password).catch((e) => {
             alert(e)
@@ -47,29 +51,51 @@ export default class FirebaseServices implements IDBservices {
 
 
     singUp = async (user: User) => {
-        return await this.auth.createUserWithEmailAndPassword(user.email, user.password).then(async () => {
-            return await this.db.collection("user").add(user.toObj()).
-            then((r) => {
-                alert("users created")
-                return r;
-            }).catch((e) => {
-                alert(e);
-            });
+        return await this.auth.createUserWithEmailAndPassword(user.email, user.password).then(async (authres) => {
+            return await this.db.collection("user").add(User.toObject(user)).
+                then((r) => {
+                    return authres;
+                });
         }).catch((e) => {
-                alert(e);
-            });
+            alert(e);
+        });
     }
 
 
     signOut = async () => {
         return this.auth
-            .signOut().catch((e)=> {
-            alert(e);
-        })
+            .signOut().catch((e) => {
+                alert(e);
+            })
     }
 
     loadAllTransaction = async (usersId: string) => {
-        await this.db.collection(this.collectonName).where("to", "==", usersId).where("from", "==", usersId).get()
+
+        var transactions: Array<Transaction> = new Array<Transaction>();
+        await this.db.collection(this.collectonName).where("from", "==", usersId)
+            .get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    if (doc.exists) {
+                        var _data = doc.data()
+                        _data.id = doc.id;
+                        transactions.push(Transaction.fromObject(_data))
+                    }
+                });
+            });
+
+        await this.db.collection(this.collectonName).where("to", "==", usersId)
+            .get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    if (doc.exists) {
+                        var _data = doc.data()
+                        _data.id = doc.id;
+                        transactions.push(Transaction.fromObject(_data))
+                    }
+                });
+            });
+
+
+        return transactions;
 
     }
 
@@ -86,13 +112,24 @@ export default class FirebaseServices implements IDBservices {
                 })
 
             })
-
-
     }
 
     makeTransferTransaction = async (transfers: Transaction) => {
-        return await this.db.collection(this.collectonName).add(transfers.toObj())
+        var doc = await this.db.collection(this.collectonName).doc()
+        doc.set(Transaction.toObject(transfers));
+        // .doc.se(Transaction.toObject(transfers))
+
+        return doc.id;
     }
+
+    editTransaction = async (transfers: Transaction) => {
+        var doc = await this.db.collection(this.collectonName).doc(transfers.id)
+        doc.set(Transaction.toObject(transfers));
+        return doc.id;
+    }
+
+
+    
 
     DeleteTransaction = async (id: string) => {
         return await this.db.collection(this.collectonName).doc(id).delete();
@@ -102,6 +139,13 @@ export default class FirebaseServices implements IDBservices {
     onAuthStateChanged = async (onAuthStateChanged: (listener: any) => void) => {
         return await this.auth.onAuthStateChanged(onAuthStateChanged);
     };
-
+    currentUser=async ()=>{
+        return   firebase.auth().currentUser
+    }
 
 }
+
+
+
+
+

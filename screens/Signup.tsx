@@ -20,9 +20,11 @@ import LoadingButton from "../components/LoadingButton";
 import { NavigationContainer } from "@react-navigation/native";
 import Auth from "../controllers/auth";
 import { User } from "../schema/User";
+import { AuthContext } from "../context/authcontext/Auth_Context";
 const { width, height } = Dimensions.get("screen");
 
 function Signup() {
+  const authContext = React.useContext(AuthContext);
 
   const [email, setEmail] = React.useState<string | null>(null)
   const [password, setPassword] = React.useState<string | null>(null)
@@ -123,7 +125,12 @@ function Signup() {
                 _user.name = name;
                 return await auth.singUp(_user).then((r) => {
 
-                  console.log(r)
+                  if (r?.user.uid !== undefined) {
+                    authContext.setLoginState(true, User.fromObj({
+                      id: r?.user.uid,
+                      email: r?.user.email
+                    }))
+                  }
 
                 }).catch((e) => {
                   alert(e)

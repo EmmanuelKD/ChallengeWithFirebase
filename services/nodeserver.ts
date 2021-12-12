@@ -61,6 +61,11 @@ class Nodeserver implements IDBservices {
     onAuthStateChanged=async(param:Function)=>{
 
     }
+    currentUser=async ()=>{
+        return null;// get data from preference
+    }
 
-
+    editTransaction=()=>{
+        
+    }
 }

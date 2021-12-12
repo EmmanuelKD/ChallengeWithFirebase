@@ -10,13 +10,16 @@ type CustomTextFieldProps = {
   style?: object;
   ref?: React.LegacyRef<TextInput> | undefined;
   keyboardType: KeyboardTypeOptions;
+  defaultVal?:string,
+
   onChange: (text:string) => void;
 
 };
 export default function CustomTextField(props: CustomTextFieldProps) {
   
   // const [hideTextval, obscureTet] = React.useState(true);
-  const { title, style, keyboardType, secureTextEntry, ref ,onChange} = props;
+  const { title, style, keyboardType,   defaultVal,
+secureTextEntry, ref ,onChange} = props;
 
   return (
     <SafeAreaView style={{ ...style }}>
@@ -24,6 +27,7 @@ export default function CustomTextField(props: CustomTextFieldProps) {
         <Text style={{ color: COLORS.PRI, fontSize: 12 }}>{title}</Text>
         <TextInput
           ref={ref}
+          defaultValue={defaultVal}
           style={styles.edittext}
            
           onChangeText={onChange}

@@ -2,14 +2,12 @@ import { Use } from "react-native-svg";
 import { Transaction } from "../schema/Transactions";
 import { User } from "../schema/User";
 import FirebaseServices from "../services/firebaseServices";
- import IDBservices from "../services/iDbServices";
-  
+import IDBservices from "../services/iDbServices";
+
 export class StoreOpperations {
-    store: IDBservices | null = null;
-    
-    StoreOpperations() {
-        this.store = new FirebaseServices()
-    }
+    store: IDBservices | null = new FirebaseServices()
+
+
 
 
     loadAllTransaction = async (usersId: string) => {
@@ -26,6 +24,10 @@ export class StoreOpperations {
 
     DeleteTransaction = async (id: string) => {
         return this.store?.DeleteTransaction(id);
+    }
+
+    editTransaction = async (transfers: Transaction) => {
+        return await this.store.editTransaction(transfers)
     }
 
 

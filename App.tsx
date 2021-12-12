@@ -10,12 +10,12 @@ import { COLORS } from './constants/Theme';
 import { AppContextProvider } from './context/appContext/App_State';
 import { AuthContextConsumer, AuthContextProvider } from './context/authcontext/Auth_State';
 import Dashboard from './screens/Dashboard';
+import Profile from "./screens/DashboardScreens/profile";
+import SearchScreen from "./screens/DashboardScreens/search";
 import Signin from './screens/Signin';
 import Signup from './screens/Signup';
 import TransactionView from './screens/Transaction';
  
-
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -80,7 +80,7 @@ function Index(
           }
         })}></Tab.Screen>
 
-        <Tab.Screen name={"Search"} component={EmptyScreen} options={{
+        <Tab.Screen name={"Search"} component={SearchScreen} options={{
           tabBarIcon: ({ focused }) => (
             <View style={{
               // centring Tab Button...
@@ -173,7 +173,7 @@ function Index(
 
 
 
-        <Tab.Screen name={"Settings"} component={EmptyScreen} options={{
+        <Tab.Screen name={"Settings"} component={Profile} options={{
           tabBarIcon: ({ focused }) => (
             <View style={{
               // centring Tab Button...

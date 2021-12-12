@@ -78,7 +78,7 @@ function Signin({ navigation }: { navigation: any }) {
                 var passwordVal = password as string
                 return await auth.signin(emailVal, passwordVal).then((r) => {
                   if (r?.user.uid !== undefined) {
-                    authContext.setLoginState(true, new User().fromObj({
+                    authContext.setLoginState(true,  User.fromObj({
                       id: r?.user.uid,
                       email: r?.user.email
                     }))

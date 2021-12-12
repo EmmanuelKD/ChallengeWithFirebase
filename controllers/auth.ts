@@ -23,16 +23,14 @@ export default class Auth extends Preference  {
 
     currentUser = async (): Promise<User | null> => {
 
-        var user: preferenceUsr | null = await this.getUserPreference();
+        var user: preferenceUsr | null = await this.store.currentUser();
         if (user == null)
             return null;
 
         var _user = new User()
         _user.id = user.id;
         _user.name = user.userName;
-        _user.id = user.id;
-        _user.email = user.email;
-
+         _user.email = user.email;
         return _user;
 
     }
@@ -40,13 +38,12 @@ export default class Auth extends Preference  {
     onAuthStateChanged = async (onAuthStateChanged: any) => {
         if (this.store instanceof FirebaseServices) {
             const subscriber = this.store.onAuthStateChanged(onAuthStateChanged);
-        } else {
+        }  
 
-        }
-
-
+       
     }
 
+  
 }
 
 // "@react-native-firebase/app": "^13.1.0",

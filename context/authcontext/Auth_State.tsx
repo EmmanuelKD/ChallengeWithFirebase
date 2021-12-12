@@ -18,14 +18,12 @@ class AuthContextProvider extends React.Component<AuthProps, AuthState> {
 
   init = async () => {
     const _user = await this.auth.currentUser()
-    if (_user?.id!==null) {
- 
+    alert(_user?.id)
+    if (_user?.id) {
       this.setState(prev => ({ ...prev, isLoggedIn: true, user: _user }))
     }
 
   }
-
-
 
   // useEffect(() => {
   //   const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
@@ -35,18 +33,18 @@ class AuthContextProvider extends React.Component<AuthProps, AuthState> {
   onAuthStateChanged = async (user: any) => {
     if (user?.id) {
       this.init();
- 
-    } else {
+     } else {
       this.setState(prev => ({ ...prev, isLoggedIn: false, user: null }))
+      return true
      }
   }
   componentDidMount() {
-    this.auth.onAuthStateChanged(this.onAuthStateChanged)
+    // this.auth.onAuthStateChanged(this.onAuthStateChanged)
     this.init();
   }
   setLoginState= (isLoged:boolean,user: User)=>{
 
-    this.setState(prev => ({ ...prev, isLoggedIn: isLoged, user: null }))
+    this.setState(prev => ({ ...prev, isLoggedIn: isLoged, user: user }))
 
   }
 
@@ -56,6 +54,7 @@ class AuthContextProvider extends React.Component<AuthProps, AuthState> {
         value={{
           isAuthenticated: this.state.isLoggedIn,
           setLoginState: this.setLoginState,
+          user:this.state.user,
 
         }}
       >

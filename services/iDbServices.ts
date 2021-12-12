@@ -8,8 +8,11 @@ export default interface IDBservices {
     loadAllTransaction: (usersId:string)=>any,
     deleteAllTransaction: (usersId:string)=>any,
     makeTransferTransaction: (transfers:Transaction)=>any,
+    editTransaction: (transfers:Transaction)=>any,
     DeleteTransaction: (id: string) => void,
     onAuthStateChanged:(param:any)=>any;
+    currentUser:()=>any;
+
 // implimnts all db services and then seperate them into auth an store in controller
 
 

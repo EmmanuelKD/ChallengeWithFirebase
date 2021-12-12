@@ -1,87 +1,107 @@
-//  import {
-//     Platform
-// } from "react-native";
-// import { Transaction, TransactionStatus } from "../schema/Transactions";
-// import  SQLite from "expo-sqlite"
+import { Asset } from "expo-asset";
+import FileSystem from "expo-file-system";
+import { Transaction } from "../schema/Transactions";
+import IDBservices from "./iDbServices";
+import SQLite, { SQLStatementErrorCallback } from "expo-sqlite"
 
-// const tableName = "transactions";
-// const dbName = "t_pay";
+async function openDatabase(pathToDatabaseFile: string): Promise<SQLite.WebSQLDatabase> {
 
-// function openDatabase() {
-//     if (Platform.OS === "web") {
-//         return {
-//             transaction: () => {
-//                 return {
-//                     executeSql: () => { },
-//                 };
-//             },
-//         };
-//     }
-//     const db = SQLite.openDatabase("t_pay.db");
-//     return db;
-// }
-// const db = openDatabase();
+    if (!(await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'SQLite')).exists) {
+        await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'SQLite');
+    }
+
+    await FileSystem.downloadAsync(
+        Asset.fromModule(require(pathToDatabaseFile)).uri,
+        FileSystem.documentDirectory + 'SQLite/myDatabaseName.db'
+    );
+
+    return SQLite.openDatabase('firebaseCash.db');
+}
 
 
 
-// export async function create(transaction: Transaction, status: TransactionStatus) {
+export default class SqlIte {
+    db: SQLite.WebSQLDatabase
+    storTran: Transaction = new Transaction();
 
-//     const created_at = Date.now();
-//     // is text empty?
-//     if (transaction === null) {
-//         return false;
-//     }
-//     db.transaction(
-//         (tx) => {
-//             tx.executeSql(`insert into ${tableName} ( 
-//                         created_at,
-//                         deleted_at,
-//                         updated_at,
-//                         amount,from,to,status) values (?,null,null,?,?,?)`, [created_at,
-//                 transaction.amount, transaction.from,
-//                 transaction.to,
-//                 status,
-//             ]);
+    init = async () => {
+        this.db = await openDatabase("firebaseCash");
+    }
+    constructor() {
+        this.init().then(() => {
+            this.db.transaction(tx => {
 
-//             tx.executeSql(`select * from ${tableName}`, [], (_, { rows }) =>
-//                 console.log(JSON.stringify(rows))
-//             );
-//         },
-//         () => { },
-//         () => { }
-//     );
+                tx.executeSql(
+                    `CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                referenceId TEXT, from TEXT ,to Text, amount INT,deleted_at STRING,created_at STRING, updated_at STRING,
+                status STRING)`
+                )
+            })
+        })
 
-// }
+    }
 
-// export async function read(onLoadSuccess: (Sparam: SQLite.SQLResultSetRowList) => void) {
+    newTransaction = (transaction: Transaction): Transaction => {
 
-//     db.transaction(
-//         (tx) => {
-//             tx.executeSql(`select * from ${tableName}`, [], (_, { rows }) => {
 
-//                 onLoadSuccess(rows);
-//                 console.log(JSON.stringify(rows))
+        var _t = { ...Transaction.toObject(transaction), updated_at: transaction.updated_at.toISOString() }
 
-//             }
-//             );
-//         },
-//         () => { },
-//         () => { }
-//     );
+        this.db.transaction(tx => {
+            tx.executeSql(`INSERT INTO transactions 
+          (id,referenceId , from  ,to , amount ,deleted_at ,created_at , updated_at , status) 
+           values (?, ?)`, [_t["id"], _t["referenceId"], _t["from"], _t["to"], _t["amount"], _t["deleted_at"]
+                , _t["created_at"], _t["updated_at"], _t["status"]],
+                (txObj, resultSet) => transaction.id = resultSet.insertId.toString())
+        })
+        return transaction;
+    }
 
-// }
 
-// // update name="name", goo="easy"
-// export async function update(affectedRowsValues: string, createdAt: string) {
-//     `update ${tableName} set ${affectedRowsValues} where created_at = ${createdAt}`
-// }
 
-// export async function deleteData(createdAt: string) {
-//     db.transaction(
-//         (tx) => {
-//             tx.executeSql(`delete from ${tableName} where created_at = ?;`, [createdAt]);
-//         },
-//         () => { },
-//         () => { })
-// }
+    loadAllTransaction = async (usersId: string) => {
+
+        var transactions: Array<Transaction> = new Array<Transaction>();
+
+        this.db.transaction(tx => {
+            // sending 4 arguments in executeSql
+            tx.executeSql('SELECT * FROM transactions', null, // passing sql query and parameters:null
+                // success callback which sends two things Transaction object and ResultSet Object
+                (txObj, { rows: { _array } }) => {
+                    _array.forEach(v => {
+                        transactions.push(Transaction.fromObject(v))
+                    })
+                }
+            ) // end executeSQL
+        }) // end transaction
+
+
+        return transactions;
+
+    }
+
+    DeleteTransaction = async (id: string) => {
+        var transactions: Array<Transaction> = new Array<Transaction>();
+        this.db.transaction(tx => {
+            tx.executeSql('DELETE FROM items WHERE id = ? ', [id],
+                (txObj, { rows: { _array } }) => {
+                    _array.forEach(v => {
+                        transactions.push(Transaction.fromObject(v))
+                    })
+                })
+        })
+        return transactions;
+    }
+
+    updateTransaction = (transaction: Transaction) => {
+        this.DeleteTransaction(transaction.id)
+        return this.newTransaction(transaction);
+    }
+
+
+}
+
+
+
+
+
 

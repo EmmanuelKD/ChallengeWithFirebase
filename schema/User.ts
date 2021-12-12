@@ -8,19 +8,32 @@ export class User {
   updated_date: Date = new Date;
   created_date: Date = new Date;
 
-  toObj = () => (
-    {
-      id: this.id,
-      name: this.name,
-      email: this.email,
-      password: this.password,
-      passwordConfirmation: this.passwordConfirmation,
-      deleted_at: this.deleted_at,
-      updated_date: this.updated_date,
-      created_date: this.created_date,
-    }
-  )
-  fromObj({
+
+}
+
+
+
+
+export namespace User {
+
+  export function toObject(usr: User): Object {
+    return (
+      {
+        id: usr.id,
+        name: usr.name,
+        email: usr.email,
+        password: usr.password,
+        passwordConfirmation: usr.passwordConfirmation,
+        deleted_at: usr.deleted_at,
+        updated_date: usr.updated_date,
+        created_date: usr.created_date,
+      }
+    )
+  }
+
+
+
+  export function fromObj({
     id,
     name,
     email,
@@ -39,15 +52,17 @@ export class User {
     updated_date?: Date,
     created_date?: Date
   }): User {
-    this.name = name;
-    this.id = id;
-    this.email = email;
-    this.password = password;
-    this.passwordConfirmation = passwordConfirmation;
-    this.deleted_at = deleted_at;
-    this.updated_date = updated_date;
-    this.created_date = created_date;
+    var usr = new User();
 
-    return this;
+    usr.name = name;
+    usr.id = id;
+    usr.email = email;
+    usr.password = password;
+    usr.passwordConfirmation = passwordConfirmation;
+    usr.deleted_at = deleted_at;
+    usr.updated_date = updated_date;
+    usr.created_date = created_date;
+
+    return usr;
   }
 }

@@ -6,6 +6,17 @@ export enum TransactionStatus {
   pending = "complete",
 }
 
+
+export namespace TransactionStatus {
+  export function toString(dir: TransactionStatus): string {
+    return TransactionStatus[dir];
+  }
+
+  export function fromString(dir: string): TransactionStatus {
+    return (TransactionStatus as any)[dir];
+  }
+}
+
 export class Transaction {
   id: string = "";
   referenceId: string = "";
@@ -17,19 +28,30 @@ export class Transaction {
   updated_at: Date = new Date();
   status: TransactionStatus = TransactionStatus.unknown;
 
-  toObj = () => ({
-    id: this.id,
-    referenceId: this.referenceId,
-    from: this.from,
-    to: this.to,
-    amount: this.amount,
-    deleted_at: this.deleted_at,
-    created_at: this.created_at,
-    updated_at: this.updated_at,
-    status: this.status,
-  })
 
-  fromObj = ({
+}
+
+
+export namespace Transaction {
+
+  export function toObject(dir: Transaction): Object {
+    return ({
+      id: dir.id,
+      referenceId: dir.referenceId,
+      from: dir.from,
+      to: dir.to,
+      amount: dir.amount,
+      deleted_at: dir.deleted_at,
+      created_at: dir.created_at,
+      updated_at: dir.updated_at,
+      status: TransactionStatus.toString(dir.status),
+    })
+  }
+
+
+
+
+  export function fromObject({
     id,
     referenceId,
     from,
@@ -38,9 +60,8 @@ export class Transaction {
     deleted_at,
     created_at,
     updated_at,
-    status,
-  }: {
-    id: string,
+    status, }: {
+    id?: string,
     referenceId: string,
     from: string,
     to: string,
@@ -50,16 +71,19 @@ export class Transaction {
     updated_at: Date,
     status: string,
   }
-  ) => {
+  ): Transaction {
+    var tra:Transaction=new Transaction();
 
-    id = this.id;
-    referenceId = this.referenceId;
-    from = this.from;
-    to = this.to;
-    amount = this.amount;
-    deleted_at = this.deleted_at;
-    created_at = this.created_at;
-    updated_at = this.updated_at;
-    status = this.status;
+    tra.id = id;
+    tra.referenceId = referenceId;
+    tra.from = from;
+    tra.to = to;
+    tra.amount = amount;
+    tra.deleted_at = deleted_at;
+    tra.created_at = created_at;
+    tra.updated_at = updated_at;
+    tra.status = TransactionStatus.fromString(status);
+
+    return tra;
   }
 }

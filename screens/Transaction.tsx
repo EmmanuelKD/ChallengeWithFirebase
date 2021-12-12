@@ -9,42 +9,47 @@ import {
 import BottomRignt from "../assets/ReactSvg/ButtomRightStyle";
 import CustomTextField from "../components/CustomTextField";
 import LoadingButton from "../components/LoadingButton";
+import { StoreOpperations } from "../controllers/store";
+import { Transaction, TransactionStatus } from "../schema/Transactions";
+import { v4 as uuid } from 'uuid';
+import { AuthContext } from "../context/authcontext/Auth_Context";
+import { User } from "../schema/User";
+import { AppContext } from "../context/appContext/AppContext";
 
 
 const { width, height } = Dimensions.get("screen");
 
-function TransactionView() {
+function TransactionView({ navigation }) {
+  const authContext = React.useContext(AuthContext);
+  const appContext = React.useContext(AppContext);
 
-  const fromRef = React.createRef<TextInput>();
-  const toRef= React.createRef<TextInput>();
-  const amountRef= React.createRef<TextInput>();
-  const pinRef= React.createRef<TextInput>();
+  const store: StoreOpperations = new StoreOpperations()
 
-  const toValue=toRef.current?.state;
-  const amountVal=amountRef.current?.state;
-  const pinVal= pinRef.current?.state;
-  
+  const [to, enterToRef] = React.useState<string | null>(null)
+  const [amount, enterAmount] = React.useState<string | null>(null)
+  const [pin, enterPin] = React.useState<string | null>(null)
+
+
+
   // const payRef= React.createRef<TextInput>();
 
   const validate = (): boolean => {
-    const toValue=toRef.current?.state;
-    const amountVal=amountRef.current?.state;
-    const pinVal= pinRef.current?.state;
-     
-    if(toValue==null){
+
+
+    if (to == null) {
       alert("To empty: please enter any value")
       return false;
-    }else
+    } else
 
-    if(amountVal==null){
-      alert("amount empty:please enter any value")
-      return false;
-    }else
+      if (amount == null) {
+        alert("amount empty:please enter any value")
+        return false;
+      } else
 
-    if(pinVal==null){
-      alert("pin empty: please enter any value")
-      return false;
-    }else return true;
+        if (pin == null) {
+          alert("pin empty: please enter any value")
+          return false;
+        } else return true;
     return false;
   };
 
@@ -71,20 +76,26 @@ function TransactionView() {
           <CustomTextField
             // ref={toRef}
             style={{ marginTop: 20 }}
-            onChange={() => { }}
+            onChange={(val) => {
+              enterToRef(val)
+            }}
             title="To ref"
             keyboardType="email-address"
           />
           <CustomTextField
             // ref={amountRef}
-            onChange={() => { }}
+            onChange={(val) => {
+              enterAmount(val)
+            }}
             title="Amount"
             keyboardType="visible-password"
             secureTextEntry={true}
           />
           <CustomTextField
             // ref={pinRef}
-            onChange={() => { }}
+            onChange={(val) => {
+              enterPin(val)
+            }}
             title="Pin"
             keyboardType="visible-password"
             secureTextEntry={true}
@@ -94,7 +105,31 @@ function TransactionView() {
             // ref={payRef}
             style={{ marginTop: 20 }}
             title="Pay"
-            onClick={() => { }}
+            onClick={async () => {
+
+              if (validate()) {
+                const transaction = Transaction.fromObject({
+                  id: "uuid()",
+                  referenceId: "uuid()",
+                  amount: amount,
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                  deleted_at: null,
+                  from: authContext.user?.id,
+                  to: "uuid()",
+                  status: TransactionStatus.complete
+                });
+
+                await store.makeTransferTransaction(transaction).then((r) => {
+                  transaction.id=r;
+                  appContext.updateTransactions(transaction);
+                  navigation.navigate("Dashboard")
+                }).catch((e) => {
+                  alert(e);
+                })
+              }
+
+            }}
           />
         </View>
         <View

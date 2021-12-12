@@ -7,6 +7,7 @@ export type AuthProps={
 export type AuthContextType={
     isAuthenticated:Boolean,
     setLoginState: (isLoged:boolean,user: User)=>void,
+    user:User,
 
 }
 
