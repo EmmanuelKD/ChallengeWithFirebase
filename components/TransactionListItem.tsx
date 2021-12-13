@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import { Transaction, TransactionStatus } from "../schema/Transactions";
 import React from "react"
 type TransactionListProps = {
-   transaction: Transaction,
+  transaction: Transaction,
   onClick: () => void;
 };
 export default function TransactionList(props: TransactionListProps) {
@@ -41,31 +41,34 @@ export default function TransactionList(props: TransactionListProps) {
       case TransactionStatus.complete:
         return <StatusComponent status="Completed" backgroundColor="red" />;
       case TransactionStatus.draft:
-        return <StatusComponent status="Completed" backgroundColor="red" />;
+        return <StatusComponent status="default" backgroundColor="blue" />;
 
       case TransactionStatus.fail:
-        return <StatusComponent status="Completed" backgroundColor="red" />;
+        return <StatusComponent status="fail" backgroundColor="red" />;
 
       case TransactionStatus.pending:
-        return <StatusComponent status="Completed" backgroundColor="red" />;
+        return <StatusComponent status="pending" backgroundColor="orange" />;
       default:
-        return <StatusComponent status="Completed" backgroundColor="red" />;
+        return <StatusComponent status="unknown" backgroundColor="grey" />;
     }
   };
 
-  const {transaction, onClick } = props;
+  const { transaction, onClick } = props;
 
   return (
-    <View style={{ 
+    <View style={{
       // height:73,
-      width: "95%", padding: 10, backgroundColor: "#fff", borderRadius: 5 ,position:"relative"}}>
-      <View style={{ width: "100%", display: "flex",
-       justifyContent: "space-between", alignSelf: "center", flexDirection: "row", flexWrap: "nowrap" }}>
-        <Text style={{ fontSize: 11 }}>{transaction.id}</Text>
+      width: "95%", padding: 10, backgroundColor: "#fff", borderRadius: 5, position: "relative"
+    }}>
+      <View style={{
+        width: "100%", display: "flex",
+        justifyContent: "space-between", alignSelf: "center", flexDirection: "row", flexWrap: "nowrap"
+      }}>
+        <Text style={{ fontSize: 11 }}>{`id:  ${transaction.id}`}</Text>
         <Status sta={transaction.status} />
       </View>
       <View>
-        <Text style={{ fontSize: 13 }}>{transaction.amount}</Text>
+        <Text style={{ fontSize: 13 }}>{`Le ${transaction.amount}`}</Text>
       </View>
       <View style={{
         width: "100%",

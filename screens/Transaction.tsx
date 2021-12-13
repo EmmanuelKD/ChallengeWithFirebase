@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid';
 import { AuthContext } from "../context/authcontext/Auth_Context";
 import { User } from "../schema/User";
 import { AppContext } from "../context/appContext/AppContext";
+import SqlIte from "../services/sqlite";
 
 
 const { width, height } = Dimensions.get("screen");
@@ -22,6 +23,7 @@ const { width, height } = Dimensions.get("screen");
 function TransactionView({ navigation }) {
   const authContext = React.useContext(AuthContext);
   const appContext = React.useContext(AppContext);
+  const liteDb = new SqlIte();
 
   const store: StoreOpperations = new StoreOpperations()
 
@@ -88,7 +90,7 @@ function TransactionView({ navigation }) {
               enterAmount(val)
             }}
             title="Amount"
-            keyboardType="visible-password"
+            keyboardType="decimal-pad"
             secureTextEntry={true}
           />
           <CustomTextField
@@ -108,28 +110,51 @@ function TransactionView({ navigation }) {
             onClick={async () => {
 
               if (validate()) {
-                const transaction = Transaction.fromObject({
-                  id: "uuid()",
-                  referenceId: "uuid()",
-                  amount: amount,
-                  created_at: new Date(),
-                  updated_at: new Date(),
-                  deleted_at: null,
-                  from: authContext.user?.id,
-                  to: "uuid()",
-                  status: TransactionStatus.complete
-                });
+                if (appContext.networkAvailable) {
 
-                await store.makeTransferTransaction(transaction).then((r) => {
-                  transaction.id=r;
-                  appContext.updateTransactions(transaction);
-                  navigation.navigate("Dashboard")
-                }).catch((e) => {
-                  alert(e);
-                })
+
+                  const transaction = Transaction.fromObject({
+                    id: "uuid()",
+                    referenceId: "uuid()",
+                    amount: amount,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    deleted_at: null,
+                    from: authContext.user?.id,
+                    to: "uuid()",
+                    status: TransactionStatus.complete
+                  });
+
+                  await store.makeTransferTransaction(transaction).then((r) => {
+                    transaction.id = r;
+                    appContext.updateTransactions(transaction);
+                    navigation.navigate("Dashboard")
+                  }).catch((e) => {
+                    alert(e);
+                  })
+                } else {
+
+                  const transaction = Transaction.fromObject({
+                    id: "uuid()",
+                    referenceId: "uuid()",
+                    amount: amount,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    deleted_at: null,
+                    from: authContext.user?.id,
+                    to: "uuid()",
+                    status: TransactionStatus.pending
+                  });
+                  // var _transaction = liteDb.newTransaction(transaction)
+                  // if (_transaction != null)
+                  //   appContext.updateTransactions(_transaction);
+
+                }
+
               }
 
-            }}
+            }
+            }
           />
         </View>
         <View

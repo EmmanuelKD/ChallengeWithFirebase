@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SwipeListView } from 'react-native-swipe-list-view';
+import EmptyAniomation from "../assets/lemptyFilelottie";
 import { COLORS } from "../constants/Theme";
 import { AppContext } from "../context/appContext/AppContext";
 import { AppContextType } from "../context/appContext/App_Types";
@@ -21,6 +22,8 @@ import LoadingButton from "./LoadingButton";
 import TransactionList from "./TransactionListItem";
 
 
+const windowHeight = Dimensions.get("window").height;
+const windowWidth = Dimensions.get("window").width;
 
 const TransactionScreen = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -236,7 +239,7 @@ const TransactionScreen = () => {
       />
     );
   };
-
+if(transactions.length>0)
   return (
     <SafeAreaView>
       <View style={styles.main}>
@@ -277,12 +280,17 @@ const TransactionScreen = () => {
       </View></SafeAreaView>
 
   );
+  return (
+    <SafeAreaView>
+    <View style={{width:windowWidth,height:windowHeight*.5}}>
+      <EmptyAniomation/>
+    </View>
+    </SafeAreaView>
+  )
 };
 
 export default TransactionScreen;
 
-const windowHeight = Dimensions.get("window").height;
-const windowWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   main: {

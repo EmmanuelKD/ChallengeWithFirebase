@@ -9,11 +9,13 @@ export type AppContextType={
     transactions:Array<Transaction>
     loadLocalTransactions:()=>void
     lodeStoreTransactions:(tran:Array<Transaction>)=>void
-    updateTransactions :(transaction: Transaction) => void,
-    updateTransactionsById :(is:string,transaction: Transaction) => void,
+    updateTransactions :(transaction: Transaction) => void
+    updateTransactionsById :(is:string,transaction: Transaction) => void
+ 
  }
 
 export type AppState={
     transactions:Array<Transaction>
-    networkAvailable:Boolean,
+    networkAvailable:Boolean
+    pendingTransaction: Array<Transaction>
 }

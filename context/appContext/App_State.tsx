@@ -4,6 +4,9 @@ import { AppContext } from "./AppContext";
 import { NetInfoChangeHandler } from "@react-native-community/netinfo";
 import listenerForNetworkChange from "../../services/networkChecker";
 import { Transaction } from "../../schema/Transactions";
+import Auth from "../../controllers/auth";
+import SqlIte from "../../services/sqlite";
+import { StoreOpperations } from "../../controllers/store";
 
 
 class AppContextProvider extends React.Component<AppProps, AppState> {
@@ -14,14 +17,32 @@ class AppContextProvider extends React.Component<AppProps, AppState> {
 
     this.state = {
       networkAvailable: false,
-      transactions: []
+      transactions: [],
+      pendingTransaction: []
     };
+  }
+
+  uploadPending=()=>{
+    if (this.state.pendingTransaction.length > 0) {
+      var sqlIte: SqlIte = new SqlIte();
+
+      var store: StoreOpperations = new StoreOpperations();
+      this.state.pendingTransaction.forEach(async (t) => {
+        await store.makeTransferTransaction(t).then(async (r) => {
+          await sqlIte.DeleteTransaction(r).then(r => {
+            this.setState(prev => ({ ...prev, pendingTransaction: [...r] }))
+
+          });
+        })
+      })
+    }
   }
 
   handleConnictivityChange = (netStat: any) => {
     if (netStat.isConnected) {
       this.setState(prev => ({ ...prev, networkAvailable: true }));
       alert("online")
+      this.uploadPending();
     } else {
       this.setState(prev => ({ ...prev, networkAvailable: false }))
       alert("offline")
@@ -42,8 +63,11 @@ class AppContextProvider extends React.Component<AppProps, AppState> {
     this.setState(prev => ({ ...prev, transactions: [..._transaction] }))
   }
 
-  loadLocalTransactions = () => {
+  loadLocalTransactions = async () => {
     // load all transactions form sqlite
+    var transaction: Array<Transaction> = await new SqlIte().loadAllTransaction();
+    console.log(transaction)
+    this.setState(prev => ({ ...prev, pendingTransaction: [...transaction] }))
   }
 
 
@@ -74,7 +98,6 @@ class AppContextProvider extends React.Component<AppProps, AppState> {
           lodeStoreTransactions: this.lodeStoreTransactions,
           updateTransactions: this.updateTransactions
           , updateTransactionsById: this.updateTransactionsById,
-
         }}
       >
         {this.props.children}

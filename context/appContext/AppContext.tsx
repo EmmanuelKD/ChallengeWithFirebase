@@ -7,7 +7,8 @@ const AppContext = React.createContext<AppContextType>({
   loadLocalTransactions: () => { },
   lodeStoreTransactions: (data) => { },
   updateTransactions :(transaction) => {},
-  updateTransactionsById :(is:string,transaction: Transaction) => {}
+  updateTransactionsById :(is:string,transaction: Transaction) => {},
+   
 
 });
 

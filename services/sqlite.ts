@@ -2,20 +2,21 @@ import { Asset } from "expo-asset";
 import FileSystem from "expo-file-system";
 import { Transaction } from "../schema/Transactions";
 import IDBservices from "./iDbServices";
-import SQLite, { SQLStatementErrorCallback } from "expo-sqlite"
+import SQLite, { SQLStatementErrorCallback, SQLTransaction } from "expo-sqlite"
 
 async function openDatabase(pathToDatabaseFile: string): Promise<SQLite.WebSQLDatabase> {
 
     if (!(await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'SQLite')).exists) {
         await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'SQLite');
+        // alert("here")
     }
 
-    await FileSystem.downloadAsync(
-        Asset.fromModule(require(pathToDatabaseFile)).uri,
-        FileSystem.documentDirectory + 'SQLite/myDatabaseName.db'
-    );
+    // await FileSystem.downloadAsync(
+    //     Asset.fromModule(require(pathToDatabaseFile)).uri,
+    //     FileSystem.documentDirectory + `SQLite/${pathToDatabaseFile}.db`
+    // );
 
-    return SQLite.openDatabase('firebaseCash.db');
+    return SQLite.openDatabase(`${pathToDatabaseFile}.db`);
 }
 
 
@@ -25,7 +26,7 @@ export default class SqlIte {
     storTran: Transaction = new Transaction();
 
     init = async () => {
-        this.db = await openDatabase("firebaseCash");
+        this.db = await openDatabase("firebaseCache");
     }
     constructor() {
         this.init().then(() => {
@@ -42,21 +43,27 @@ export default class SqlIte {
     }
 
     newTransaction = (transaction: Transaction): Transaction => {
+        try {
+            var _t = { ...Transaction.toObject(transaction), updated_at: transaction.updated_at.toISOString() }
 
+            this.db.transaction(tx => {
+                tx.executeSql(`INSERT INTO transactions 
+      (id,referenceId , from  ,to , amount ,deleted_at ,created_at , updated_at , status) 
+       values (?, ?)`, [_t["id"], _t["referenceId"], _t["from"], _t["to"], _t["amount"], _t["deleted_at"]
+                    , _t["created_at"], _t["updated_at"], _t["status"]],
+                    (txObj, resultSet) => transaction.id = resultSet.insertId.toString(),
 
-        var _t = { ...Transaction.toObject(transaction), updated_at: transaction.updated_at.toISOString() }
+                )
+            })
+            return transaction;
+        } catch (e) {
+            alert(e)
+            return null;
+        }
 
-        this.db.transaction(tx => {
-            tx.executeSql(`INSERT INTO transactions 
-          (id,referenceId , from  ,to , amount ,deleted_at ,created_at , updated_at , status) 
-           values (?, ?)`, [_t["id"], _t["referenceId"], _t["from"], _t["to"], _t["amount"], _t["deleted_at"]
-                , _t["created_at"], _t["updated_at"], _t["status"]],
-                (txObj, resultSet) => transaction.id = resultSet.insertId.toString())
-        })
-        return transaction;
     }
 
-    loadAllTransaction = async (usersId: string) => {
+    loadAllTransaction = async () => {
 
         var transactions: Array<Transaction> = new Array<Transaction>();
 
